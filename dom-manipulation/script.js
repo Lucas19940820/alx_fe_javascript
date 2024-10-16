@@ -104,7 +104,7 @@ function createAddQuoteForm() {
 }
 
 // Function to add a new quote
-function addQuote() {
+async function addQuote() {
     const quoteText = document.getElementById('newQuoteText').value;
     const quoteCategory = document.getElementById('newQuoteCategory').value;
 
@@ -122,6 +122,9 @@ function addQuote() {
         // Save updated quotes to localStorage
         saveQuotes();
 
+        // Send new quote to the server
+        await postNewQuote(newQuote);
+
         // Clear the input fields
         document.getElementById('newQuoteText').value = '';
         document.getElementById('newQuoteCategory').value = '';
@@ -135,6 +138,28 @@ function addQuote() {
         alert('New quote added successfully!');
     } else {
         alert('Please enter both quote text and category!');
+    }
+}
+
+// Function to post a new quote to the server
+async function postNewQuote(quote) {
+    try {
+        const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(quote),
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const responseData = await response.json();
+        console.log('New quote added on server:', responseData);
+    } catch (error) {
+        console.error('Error posting new quote:', error);
     }
 }
 
