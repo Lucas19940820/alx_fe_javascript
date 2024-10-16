@@ -8,10 +8,53 @@ let quotes = JSON.parse(localStorage.getItem('quotes')) || [
 // Get references to the DOM elements
 const quoteDisplay = document.getElementById('quoteDisplay');
 const newQuoteButton = document.getElementById('newQuote');
+const categoryFilter = document.getElementById('categoryFilter');
 
 // Function to save quotes to localStorage
 function saveQuotes() {
     localStorage.setItem('quotes', JSON.stringify(quotes));
+}
+
+// Function to fetch quotes from the Quotable API
+async function fetchQuotesFromServer() {
+    try {
+        const response = await fetch('https://api.quotable.io/random?count=5'); // Fetch 5 random quotes
+        const serverQuotes = await response.json();
+
+        // Format the quotes into the desired structure
+        const formattedServerQuotes = serverQuotes.results.map(item => ({
+            text: item.content,
+            category: item.tags.length > 0 ? item.tags[0] : "Uncategorized" // Use the first tag as the category
+        }));
+
+        // Handle syncing with local data
+        syncQuotes(formattedServerQuotes);
+    } catch (error) {
+        console.error('Error fetching quotes from server:', error);
+    }
+}
+
+// Function to sync quotes
+function syncQuotes(serverQuotes) {
+    const newQuotes = [];
+
+    serverQuotes.forEach(serverQuote => {
+        // Check for conflicts: if the quote already exists in local storage
+        const existingQuote = quotes.find(quote => quote.text === serverQuote.text);
+        if (!existingQuote) {
+            newQuotes.push(serverQuote); // Only add if not already existing
+        } else {
+            // Conflict resolution: Notify user and keep existing quote
+            alert(`Conflict detected: "${existingQuote.text}" already exists. Keeping the local version.`);
+        }
+    });
+
+    // Append new quotes to the local storage
+    if (newQuotes.length > 0) {
+        quotes.push(...newQuotes);
+        saveQuotes();
+        alert(`${newQuotes.length} new quotes added from the server!`);
+    }
 }
 
 // Function to display a random quote
@@ -125,10 +168,17 @@ function importFromJsonFile(event) {
 
 // Function to populate the category filter dropdown
 function populateCategories() {
-    const categoryFilter = document.getElementById('categoryFilter');
+    // Clear existing options
+    categoryFilter.innerHTML = '';
 
     // Get unique categories from the quotes array
     const categories = [...new Set(quotes.map(quote => quote.category))];
+
+    // Add an "All Categories" option
+    const allOption = document.createElement('option');
+    allOption.value = 'all';
+    allOption.textContent = 'All Categories';
+    categoryFilter.appendChild(allOption);
 
     // Populate the dropdown with categories
     categories.forEach(category => {
@@ -141,7 +191,7 @@ function populateCategories() {
 
 // Function to filter quotes based on selected category
 function filterQuotes() {
-    const selectedCategory = document.getElementById('categoryFilter').value;
+    const selectedCategory = categoryFilter.value;
 
     // Clear the current quote display
     quoteDisplay.innerHTML = '';
@@ -165,16 +215,23 @@ function filterQuotes() {
 // Restore the last selected filter when the page loads
 function restoreSelectedCategory() {
     const savedCategory = localStorage.getItem('selectedCategory') || 'all';
-    document.getElementById('categoryFilter').value = savedCategory;
+    categoryFilter.value = savedCategory;
     filterQuotes();
 }
 
 // Event listener for the "Show New Quote" button
 newQuoteButton.addEventListener('click', showRandomQuote);
 
+// Start periodic data fetching from the server
+function startQuoteSync() {
+    fetchQuotesFromServer();
+    setInterval(fetchQuotesFromServer, 60000); // Check every 60 seconds
+}
+
 // Call functions to populate categories and restore last selected filter on page load
 window.onload = function() {
     populateCategories();
     restoreSelectedCategory();
     createAddQuoteForm();
+    startQuoteSync(); // Start syncing quotes with the server
 };
