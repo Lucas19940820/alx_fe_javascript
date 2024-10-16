@@ -15,16 +15,16 @@ function saveQuotes() {
     localStorage.setItem('quotes', JSON.stringify(quotes));
 }
 
-// Function to fetch quotes from the Quotable API
+// Function to fetch quotes from the mock server
 async function fetchQuotesFromServer() {
     try {
-        const response = await fetch('https://api.quotable.io/random?count=5'); // Fetch 5 random quotes
+        const response = await fetch('https://jsonplaceholder.typicode.com/posts');
         const serverQuotes = await response.json();
 
-        // Format the quotes into the desired structure
-        const formattedServerQuotes = serverQuotes.results.map(item => ({
-            text: item.content,
-            category: item.tags.length > 0 ? item.tags[0] : "Uncategorized" // Use the first tag as the category
+        // Simulate converting server quotes to our format
+        const formattedServerQuotes = serverQuotes.map(item => ({
+            text: item.title,
+            category: "Server Updates" // Assign a default category for fetched quotes
         }));
 
         // Handle syncing with local data
