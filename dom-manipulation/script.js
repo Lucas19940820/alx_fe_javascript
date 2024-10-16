@@ -1,8 +1,8 @@
 // Initial set of quotes
 let quotes = [
-  { text: "Be yourself; everyone is already taken", author: "Oscar Wilde" },
-  { text: "Success is not final, failure is not fatal: It is the courage to continue that counts.", author: "Winston Churchill" },
-  { text: "In the end, we will remember not the words of our enemies, but the silence of our friends", author: "Martin Luther King Jr" }
+  { text: "Be yourself; everyone is already taken", category: "Individuality" },
+  { text: "Success is not final, failure is not fatal: It is the courage to continue that counts.", category: "Perseverance & Success" },
+  { text: "In the end, we will remember not the words of our enemies, but the silence of our friends", category: "Leadership & Social Justice" }
 ];
 
 // Get references to the DOM elements
@@ -21,7 +21,7 @@ function showRandomQuote() {
   
   // Create a new paragraph to display the quote text
   const quoteTextElement = document.createElement('p');
-  quoteTextElement.textContent = `"${randomQuote.text}" - ${randomQuote.author}`;
+  quoteTextElement.textContent = `"${randomQuote.text}" - ${randomQuote.category}`;
   
   // Append the paragraph to the quote display area
   quoteDisplay.appendChild(quoteTextElement);
@@ -30,14 +30,14 @@ function showRandomQuote() {
 // Function to add a new quote
 function addQuote() {
   const quoteText = document.getElementById('newQuoteText').value;
-  const quoteAuthor = document.getElementById('newQuoteAuthor').value;
+  const quoteCategory = document.getElementById('newQuoteCategory').value;
   
   // Check if both fields are filled
-  if (quoteText !== '' && quoteAuthor !== '') {
+  if (quoteText !== '' && quoteCategory !== '') {
     // Create a new quote object
     const newQuote = {
       text: quoteText,
-      author: quoteAuthor
+      category: quoteCategory
     };
     
     // Add the new quote to the quotes array
@@ -45,12 +45,12 @@ function addQuote() {
     
     // Clear the input fields
     document.getElementById('newQuoteText').value = '';
-    document.getElementById('newQuoteAuthor').value = '';
+    document.getElementById('newQuoteCategory').value = '';
     
     // Optionally display the new quote added
     alert('New quote added successfully!');
   } else {
-    alert('Please enter both quote text and author!');
+    alert('Please enter both quote text and category!');
   }
 }
 
