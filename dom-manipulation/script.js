@@ -37,6 +37,7 @@ async function fetchQuotesFromServer() {
 // Function to sync quotes
 function syncQuotes(serverQuotes) {
     const newQuotes = [];
+    const conflicts = []; // Array to hold conflict messages
 
     serverQuotes.forEach(serverQuote => {
         // Check for conflicts: if the quote already exists in local storage
@@ -44,8 +45,10 @@ function syncQuotes(serverQuotes) {
         if (!existingQuote) {
             newQuotes.push(serverQuote); // Only add if not already existing
         } else {
-            // Conflict resolution: Notify user and keep existing quote
-            alert(`Conflict detected: "${existingQuote.text}" already exists. Keeping the local version.`);
+            // Conflict resolution: Log the conflict without alerting
+            conflicts.push(`Conflict detected: "${existingQuote.text}" already exists. Keeping the local version.`);
+            // Optionally: You can uncomment the line below if you want to update the local quote
+            // existingQuote.category = serverQuote.category; // Example of updating the category
         }
     });
 
@@ -54,8 +57,15 @@ function syncQuotes(serverQuotes) {
         quotes.push(...newQuotes);
         saveQuotes();
         alert(`${newQuotes.length} new quotes added from the server!`);
+        console.log("Quotes synced with server!");
+    }
+
+    // Log all conflict messages to the console
+    if (conflicts.length > 0) {
+        conflicts.forEach(conflict => console.log(conflict));
     }
 }
+
 
 // Function to display a random quote
 function showRandomQuote() {
