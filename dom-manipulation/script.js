@@ -47,8 +47,8 @@ function syncQuotes(serverQuotes) {
         } else {
             // Conflict resolution: Log the conflict without alerting
             conflicts.push(`Conflict detected: "${existingQuote.text}" already exists. Keeping the local version.`);
-            // Optionally: You can uncomment the line below if you want to update the local quote
-            // existingQuote.category = serverQuote.category; // Example of updating the category
+           
+            existingQuote.category = serverQuote.category; // Updating the category
         }
     });
 
@@ -189,17 +189,8 @@ function exportQuotes() {
     URL.revokeObjectURL(url);
 }
 
-// Function to import quotes from a JSON file
-function importFromJsonFile(event) {
-    const fileReader = new FileReader();
-    fileReader.onload = function(event) {
-        const importedQuotes = JSON.parse(event.target.result);
-        quotes.push(...importedQuotes); // Merge new quotes with existing
-        saveQuotes(); // Save the updated quotes to localStorage
-        alert('Quotes imported successfully!');
-    };
-    fileReader.readAsText(event.target.files[0]);
-}
+
+
 
 // Function to populate the category filter dropdown
 function populateCategories() {
